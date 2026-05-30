@@ -1,0 +1,751 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--t:#1D9E75;--tl:#E1F5EE;--td:#085041;--al:#FAEEDA;--ad:#633806}
+body{font-family:var(--font-sans);direction:rtl;font-size:14px}
+.screen{display:none}.screen.on{display:block}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-direction:row-reverse}
+.prog{display:flex;gap:4px;align-items:center;flex-direction:row-reverse}
+.pd{width:8px;height:8px;border-radius:50%;background:var(--color-border-tertiary);transition:all .2s}
+.pd.done{background:var(--t)}.pd.active{background:var(--t);width:20px;border-radius:4px}
+.step-lbl{font-size:11px;color:var(--color-text-secondary)}
+.pg-title{font-size:17px;font-weight:500;color:var(--color-text-primary);text-align:center;margin-bottom:4px}
+.pg-sub{font-size:13px;color:var(--color-text-secondary);text-align:center;margin-bottom:1.5rem}
+.inp{width:100%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;font-size:14px;color:var(--color-text-primary);font-family:var(--font-sans);outline:none;direction:rtl;text-align:right;margin-bottom:.75rem}.inp:focus{border-color:var(--t)}
+.lbl{font-size:11px;color:var(--color-text-secondary);font-weight:500;letter-spacing:.05em;margin-bottom:6px}
+.btn{width:100%;padding:11px;border:none;border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-sans);direction:rtl;margin-top:.25rem}
+.btn.primary{background:var(--t);color:#fff}.btn.primary:hover{background:var(--td)}
+.btn.secondary{background:none;color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary);margin-top:.5rem}.btn.secondary:hover{background:var(--color-background-secondary)}
+.btn.word{background:#185FA5;color:#fff;margin-top:.5rem}.btn.word:hover{background:#0C447C}
+.wx-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:1rem 0}
+.wx-card{cursor:pointer;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem .75rem;text-align:center;transition:all .15s;background:var(--color-background-primary)}.wx-card:hover{border-color:var(--t)}.wx-card.on{border:1.5px solid var(--t);background:var(--tl)}
+.wi{font-size:36px;display:block;margin-bottom:6px}.wn{font-size:13px;font-weight:500}.wd{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.face-row{display:flex;gap:10px;margin:1rem 0}
+.fc{cursor:pointer;flex:1;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem .5rem;text-align:center;transition:all .15s;background:var(--color-background-primary)}.fc:hover{border-color:var(--t)}.fc.on{border:1.5px solid var(--t);background:var(--tl)}
+.fi{font-size:34px;display:block;margin-bottom:6px}.fl{font-size:12px;font-weight:500}
+.body-row{display:flex;gap:1.25rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin:1rem 0}
+.zpill{display:inline-flex;align-items:center;gap:5px;background:var(--tl);border-radius:var(--border-radius-md);padding:3px 9px;font-size:11px;color:var(--td);border:0.5px solid #9FE1CB;margin:2px}
+.mot-inp{width:100%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;font-size:20px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-sans);outline:none;direction:rtl;text-align:center;margin:1rem 0}.mot-inp:focus{border-color:var(--t)}.mot-inp::placeholder{font-size:14px;font-weight:400;color:var(--color-text-tertiary)}
+.note-ta{width:100%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 10px;font-size:12px;color:var(--color-text-primary);font-family:var(--font-sans);resize:none;outline:none;direction:rtl;margin-top:.5rem}.note-ta:focus{border-color:var(--t)}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:1.25rem 0}
+/* GAMES MENU */
+.games-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1rem 0}
+.game-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem .875rem;text-align:center;background:var(--color-background-primary);position:relative;transition:all .15s;cursor:pointer}
+.game-card:hover{border-color:var(--t);transform:translateY(-1px)}
+.game-card.started{border:1.5px solid var(--t);background:var(--tl)}
+.game-card.done{border:1.5px solid #059669;background:#D1FAE5}
+.game-badge{position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:#fff}
+.game-card.started .game-badge{display:flex;background:var(--t)}
+.game-card.done .game-badge{display:flex;background:#059669}
+.game-icon{font-size:38px;display:block;margin-bottom:8px}
+.game-name{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.game-sub{font-size:10px;color:var(--color-text-secondary)}
+/* SHARED GAME */
+.g-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-direction:row-reverse;padding-bottom:.75rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.g-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.g-back{background:none;border:none;cursor:pointer;font-size:12px;color:var(--color-text-secondary);font-family:var(--font-sans)}
+.g-progress{height:5px;background:var(--color-border-tertiary);border-radius:3px;margin-bottom:1.25rem;overflow:hidden}
+.g-progress-bar{height:100%;background:var(--t);border-radius:3px;transition:width .4s ease}
+.game-result{text-align:center;padding:1.5rem .5rem}
+.big-ico-r{font-size:72px;display:block;margin-bottom:1rem;animation:popIn .4s ease}
+.r-title{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.r-sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem}
+@keyframes popIn{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
+@keyframes correctPop{0%{transform:scale(1)}40%{transform:scale(1.1)}100%{transform:scale(1)}}
+/* MIROIR */
+.miroir-emoji{font-size:96px;text-align:center;display:block;margin:.75rem 0;animation:popIn .3s ease}
+.mir-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:.75rem}
+.mir-btn{padding:14px 6px;border:1.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);font-size:17px;font-weight:500;cursor:pointer;background:var(--color-background-primary);font-family:var(--font-sans);color:var(--color-text-primary);transition:all .15s}
+.mir-btn:hover{border-color:var(--t);background:var(--tl)}
+.mir-btn.correct{background:#D1FAE5;border-color:#059669;animation:correctPop .35s ease}
+.mir-btn.wrong{background:#FEE2E2;border-color:#DC2626;animation:shake .4s ease}
+.mir-log{margin-top:.75rem;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.5rem .75rem;font-size:11px;color:var(--color-text-secondary);max-height:80px;overflow-y:auto;direction:rtl}
+/* BOITE */
+.sit-display{text-align:center;margin:1.25rem 0 .75rem}
+.sit-emoji{font-size:76px;display:block;margin-bottom:.5rem;animation:popIn .3s ease}
+.sit-text{font-size:16px;font-weight:500;color:var(--color-text-primary);margin-bottom:.25rem}
+.sit-hint{font-size:11px;color:var(--ad);background:var(--al);padding:4px 10px;border-radius:var(--border-radius-md);display:inline-block}
+.boxes-row{display:flex;gap:8px;margin:1rem 0}
+.box-btn{flex:1;padding:1.1rem .5rem;border:1.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);text-align:center;cursor:pointer;background:var(--color-background-primary);transition:all .2s}
+.box-btn:hover{transform:scale(1.04)}.box-btn:active{transform:scale(.97)}
+.box-btn.correct-flash{background:#D1FAE5;border-color:#059669;animation:correctPop .4s ease}
+.box-btn.wrong-flash{background:#FEE2E2;border-color:#DC2626;animation:shake .4s ease}
+.box-ico{font-size:30px;display:block;margin-bottom:5px}.box-lbl{font-size:13px;font-weight:500}
+/* RESPIRATION */
+.breath-palette{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:1.5rem 0}
+.color-swatch{width:54px;height:54px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .2s;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.color-swatch:hover{transform:scale(1.1)}
+.color-swatch.selected{border:4px solid #111;transform:scale(1.18);box-shadow:0 0 0 3px rgba(0,0,0,.12)}
+@keyframes breathe{0%,100%{transform:scale(.32)}50%{transform:scale(1)}}
+.breath-circle{width:160px;height:160px;border-radius:50%;animation:breathe 8s ease-in-out infinite;animation-play-state:paused;transition:background .4s;box-shadow:0 0 30px rgba(0,0,0,.15)}
+.breath-phase{font-size:26px;font-weight:500;color:var(--color-text-primary);text-align:center;min-height:38px;margin-bottom:.75rem;transition:all .3s}
+.breath-cycles{font-size:13px;color:var(--color-text-secondary);text-align:center;margin-top:.75rem}
+.breath-ctrl{display:flex;gap:10px;margin-top:1.25rem;justify-content:center}
+.b-btn{padding:10px 22px;border:1.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer;background:var(--color-background-primary);font-family:var(--font-sans);color:var(--color-text-primary);transition:all .15s}
+.b-btn.play{background:var(--t);color:#fff;border-color:var(--t)}.b-btn:hover{opacity:.85}
+/* CORPS COLOR */
+.cc-wrap{display:flex;gap:1rem;align-items:flex-start;justify-content:center;margin:1rem 0;flex-wrap:wrap}
+.brushes{display:flex;flex-direction:column;gap:6px;min-width:88px}
+.brush-row{display:flex;align-items:center;gap:8px;cursor:pointer;padding:5px 7px;border-radius:var(--border-radius-md);border:1.5px solid transparent;transition:all .15s}
+.brush-row:hover{background:var(--color-background-secondary)}
+.brush-row.selected{border-color:#111;background:var(--color-background-secondary)}
+.brush-dot{width:24px;height:24px;border-radius:50%;flex-shrink:0}
+.brush-name{font-size:11px;font-weight:500}
+/* EVAL */
+.ir-row{display:flex;gap:8px;margin:1rem 0}
+.ir-btn{flex:1;cursor:pointer;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:.875rem .5rem;text-align:center;transition:all .15s;background:var(--color-background-primary)}
+.ir-btn:hover{border-color:var(--t)}.ir-btn.on{border:1.5px solid var(--t);background:var(--tl)}
+.ir-icon{font-size:26px;display:block;margin-bottom:5px}.ir-lbl{font-size:11px;font-weight:500;line-height:1.4}
+/* GRID */
+.gc{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:.875rem 1rem;margin-bottom:.625rem;display:flex;align-items:flex-start;gap:10px;flex-direction:row-reverse}
+.gav{width:38px;height:38px;border-radius:50%;background:var(--tl);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--td);flex-shrink:0;margin-top:2px}
+.gi{flex:1;text-align:right}.gn{font-size:13px;font-weight:500}.gm{font-size:11px;color:var(--color-text-secondary);margin-top:2px}.gmot{font-size:12px;color:var(--t);font-weight:500;margin-top:3px}.gex{font-size:11px;color:#185FA5;margin-top:3px;font-weight:500}
+.empty{text-align:center;padding:2rem;color:var(--color-text-secondary);font-size:13px}
+.cb{background:var(--t);color:#fff;font-size:10px;font-weight:500;padding:1px 6px;border-radius:10px;margin-right:4px}
+.saved-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:.75rem}
+.g-done-chip{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:4px 10px;font-size:12px;color:var(--color-text-primary)}
+.g-done-chip.done{background:#D1FAE5;border-color:#059669;color:#065F46}
+</style>
+
+<div style="padding:1rem 0 0">
+
+<!-- HOME -->
+<div id="s-home" class="screen on">
+  <div style="text-align:center;margin-bottom:1.5rem">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:var(--tl);border-radius:var(--border-radius-lg);padding:.5rem 1rem;margin-bottom:1rem">
+      <span style="font-size:12px;font-weight:500;color:var(--td)">جمعية المستقبل</span>
+      <span style="font-size:11px;color:var(--t)" id="home-date"></span>
+    </div>
+    <div style="font-size:18px;font-weight:500;margin-bottom:4px">جلسة التعبير العاطفي</div>
+    <div style="font-size:13px;color:var(--color-text-secondary)">إعاقة ذهنية · 14–40 سنة</div>
+  </div>
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:1rem;margin-bottom:1rem">
+    <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:.5rem;text-align:right">مستفيدون مسجّلون</div>
+    <div style="font-size:28px;font-weight:500;color:var(--t);text-align:center" id="home-count">0</div>
+  </div>
+  <button class="btn primary" onclick="startNew()">+ مستفيد جديد</button>
+  <button class="btn secondary" onclick="goGrid()">عرض الشبكة والتصدير</button>
+</div>
+
+<!-- REGISTER -->
+<div id="s-reg" class="screen">
+  <div class="top-bar"><button onclick="goHome()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--color-text-secondary);font-family:var(--font-sans)">← رجوع</button><span class="step-lbl">التسجيل</span></div>
+  <div class="pg-title">معلومات المستفيد</div><div class="pg-sub">الاسم والسن فقط</div>
+  <div class="lbl">الاسم</div><input class="inp" id="reg-name" placeholder="مثال: م1 أو الحسن...">
+  <div class="lbl">السن</div><input class="inp" id="reg-age" placeholder="مثال: 25" type="number" min="14" max="40">
+  <button class="btn primary" onclick="startActivity()">ابدأ الجلسة ←</button>
+</div>
+
+<!-- STEP 1: METEO -->
+<div id="s-meteo" class="screen">
+  <div class="top-bar"><div class="prog"><div class="pd active"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div><span class="step-lbl" id="sn1"></span></div>
+  <div class="pg-title">كيف طقسك اليوم؟</div><div class="pg-sub">اختر الصورة التي تشبه حالك</div>
+  <div class="wx-grid">
+    <div class="wx-card" onclick="pickWx(this,'sunny','☀️','مشمس')"><span class="wi">☀️</span><div class="wn">مشمس</div><div class="wd">سعيد ومرتاح</div></div>
+    <div class="wx-card" onclick="pickWx(this,'cloudy','⛅','غائم')"><span class="wi">⛅</span><div class="wn">غائم</div><div class="wd">لا أعرف تماماً</div></div>
+    <div class="wx-card" onclick="pickWx(this,'rainy','🌧️','ممطر')"><span class="wi">🌧️</span><div class="wn">ممطر</div><div class="wd">حزين أو متعب</div></div>
+    <div class="wx-card" onclick="pickWx(this,'stormy','⛈️','عاصف')"><span class="wi">⛈️</span><div class="wn">عاصف</div><div class="wd">متوتر أو غاضب</div></div>
+  </div>
+  <button class="btn primary" id="wx-next" onclick="showScreen('s-face')" style="display:none">التالي ←</button>
+  <button class="btn secondary" onclick="cur.wx=null;cur.wxE='';cur.wxN='';showScreen('s-face')">تخطّي</button>
+</div>
+
+<!-- STEP 2: FACE -->
+<div id="s-face" class="screen">
+  <div class="top-bar"><div class="prog"><div class="pd done"></div><div class="pd active"></div><div class="pd"></div><div class="pd"></div></div><span class="step-lbl" id="sn2"></span></div>
+  <div class="pg-title">كيف تشعر اليوم؟</div><div class="pg-sub">أرِني الوجه الذي يشبه حالك</div>
+  <div class="face-row">
+    <div class="fc" onclick="pickFace(this,'😊','سعيد')"><span class="fi">😊</span><span class="fl">سعيد</span></div>
+    <div class="fc" onclick="pickFace(this,'😐','عادي')"><span class="fi">😐</span><span class="fl">عادي</span></div>
+    <div class="fc" onclick="pickFace(this,'😔','حزين')"><span class="fi">😔</span><span class="fl">حزين</span></div>
+  </div>
+  <button class="btn primary" id="face-next" onclick="showScreen('s-corps')" style="display:none">التالي ←</button>
+  <button class="btn secondary" onclick="showScreen('s-corps')">تخطّي</button>
+</div>
+
+<!-- STEP 3: CORPS -->
+<div id="s-corps" class="screen">
+  <div class="top-bar"><div class="prog"><div class="pd done"></div><div class="pd done"></div><div class="pd active"></div><div class="pd"></div></div><span class="step-lbl" id="sn3"></span></div>
+  <div class="pg-title">أرِني أين تشعر بشيء</div><div class="pg-sub">انقر على المنطقة</div>
+  <div class="body-row">
+    <svg width="130" height="270" viewBox="0 0 130 270" xmlns="http://www.w3.org/2000/svg">
+      <g id="bz-head" style="cursor:pointer" onclick="toggleBZ('head','الرأس')"><ellipse cx="65" cy="30" rx="23" ry="26" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1"/><text x="65" y="35" text-anchor="middle" font-size="9" fill="#5F5E5A" font-family="sans-serif">الرأس</text></g>
+      <rect x="57" y="55" width="16" height="14" rx="3" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1" style="cursor:pointer" onclick="toggleBZ('head','الرأس')"/>
+      <g id="bz-chest" style="cursor:pointer" onclick="toggleBZ('chest','الصدر')"><rect x="30" y="69" width="70" height="50" rx="7" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/><text x="65" y="99" text-anchor="middle" font-size="9" fill="#0C447C" font-family="sans-serif">الصدر</text></g>
+      <g id="bz-belly" style="cursor:pointer" onclick="toggleBZ('belly','البطن')"><rect x="34" y="122" width="62" height="44" rx="7" fill="#C0DD97" stroke="#3B6D11" stroke-width="1"/><text x="65" y="149" text-anchor="middle" font-size="9" fill="#27500A" font-family="sans-serif">البطن</text></g>
+      <g id="bz-arms" style="cursor:pointer" onclick="toggleBZ('arms','الذراعان')"><rect x="4" y="72" width="22" height="76" rx="9" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1"/><rect x="104" y="72" width="22" height="76" rx="9" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1"/></g>
+      <g id="bz-legs" style="cursor:pointer" onclick="toggleBZ('legs','الساقان')"><rect x="34" y="169" width="24" height="88" rx="9" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1"/><rect x="72" y="169" width="24" height="88" rx="9" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1"/><text x="65" y="228" text-anchor="middle" font-size="9" fill="#5F5E5A" font-family="sans-serif">الساقان</text></g>
+    </svg>
+    <div style="flex:1;min-width:120px">
+      <div class="lbl">محدّد</div>
+      <div id="bz-active" style="min-height:28px"><span style="font-size:12px;color:var(--color-text-tertiary)">لا شيء</span></div>
+      <div class="lbl" style="margin-top:1rem">ملاحظة</div>
+      <textarea id="corps-note" class="note-ta" rows="3" placeholder="مثال: يشير إلى البطن..."></textarea>
+    </div>
+  </div>
+  <button class="btn primary" onclick="showScreen('s-mot')">التالي ←</button>
+</div>
+
+<!-- STEP 4: MOT -->
+<div id="s-mot" class="screen">
+  <div class="top-bar"><div class="prog"><div class="pd done"></div><div class="pd done"></div><div class="pd done"></div><div class="pd active"></div></div><span class="step-lbl" id="sn4"></span></div>
+  <div class="pg-title">كلمة واحدة</div><div class="pg-sub">قل لي كلمة واحدة تصف حالك الآن</div>
+  <input class="mot-inp" id="mot-val" placeholder="اكتب كلمة واحدة..." maxlength="20">
+  <div class="lbl">ملاحظة سلوكية</div>
+  <textarea id="mot-note" class="note-ta" rows="2" placeholder="ما لاحظته على المستفيد..."></textarea>
+  <button class="btn primary" onclick="saveMot();showScreen('s-games-menu')" style="margin-top:1rem">التمارين العملية ←</button>
+  <button class="btn secondary" onclick="saveMot();showScreen('s-eval')">تخطّي إلى التقييم</button>
+</div>
+
+<!-- GAMES MENU -->
+<div id="s-games-menu" class="screen">
+  <div class="top-bar"><button onclick="showScreen('s-mot')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--color-text-secondary);font-family:var(--font-sans)">← رجوع</button><span style="font-size:14px;font-weight:500">التمارين العملية</span></div>
+  <div class="pg-sub" style="margin-bottom:.5rem">اختر تمريناً لتبدأ</div>
+  <div class="games-grid">
+    <div class="game-card" id="gc-miroir" onclick="initMiroir()"><div class="game-badge">✓</div><span class="game-icon">🪞</span><div class="game-name">لعبة المرايا</div><div class="game-sub">Jeu des Émotions</div></div>
+    <div class="game-card" id="gc-boite" onclick="initBoite()"><div class="game-badge">✓</div><span class="game-icon">📦</span><div class="game-name">صندوق المواقف</div><div class="game-sub">Boîte à Situations</div></div>
+    <div class="game-card" id="gc-resp" onclick="initRespiration()"><div class="game-badge">✓</div><span class="game-icon">🎈</span><div class="game-name">التنفس الملون</div><div class="game-sub">Respiration Colorée</div></div>
+    <div class="game-card" id="gc-corps" onclick="initCorpsColor()"><div class="game-badge">✓</div><span class="game-icon">🗺️</span><div class="game-name">خريطة الجسد</div><div class="game-sub">Cartographie Émotionnelle</div></div>
+  </div>
+  <button class="btn primary" onclick="showScreen('s-eval')">التالي: تقييم التفاعل ←</button>
+</div>
+
+<!-- GAME 1: MIROIR -->
+<div id="s-game-miroir" class="screen">
+  <div class="g-topbar"><button class="g-back" onclick="leaveGame('miroir')">← رجوع</button><span class="g-title">🪞 لعبة المرايا</span></div>
+  <div id="mir-content">
+    <div class="g-progress"><div class="g-progress-bar" id="mir-prog" style="width:0%"></div></div>
+    <div style="text-align:center;font-size:12px;color:var(--color-text-secondary);margin-bottom:.25rem" id="mir-qnum"></div>
+    <span class="miroir-emoji" id="mir-emoji"></span>
+    <div style="text-align:center;font-size:13px;color:var(--color-text-secondary);margin-bottom:.5rem">ما هذه العاطفة؟</div>
+    <div class="mir-grid" id="mir-options"></div>
+    <div class="mir-log" id="mir-log"></div>
+  </div>
+  <div class="game-result" id="mir-result" style="display:none">
+    <span class="big-ico-r" id="mir-r-ico"></span>
+    <div class="r-title" id="mir-r-title"></div>
+    <div class="r-sub" id="mir-r-sub"></div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem;margin:1rem 0;font-size:12px;text-align:right" id="mir-detail"></div>
+    <button class="btn primary" onclick="leaveGame('miroir',true)">رجوع إلى القائمة</button>
+  </div>
+</div>
+
+<!-- GAME 2: BOÎTE -->
+<div id="s-game-boite" class="screen">
+  <div class="g-topbar"><button class="g-back" onclick="leaveGame('boite')">← رجوع</button><span class="g-title">📦 صندوق المواقف</span></div>
+  <div id="boite-content">
+    <div class="g-progress"><div class="g-progress-bar" id="boite-prog" style="width:0%"></div></div>
+    <div style="text-align:center;font-size:12px;color:var(--color-text-secondary);margin-bottom:.25rem" id="boite-qnum"></div>
+    <div class="sit-display"><span class="sit-emoji" id="sit-emoji"></span><div class="sit-text" id="sit-text"></div><div class="sit-hint">ضعها في الصندوق الصحيح</div></div>
+    <div class="boxes-row">
+      <div class="box-btn" onclick="sortBoite('فرح',this)"><span class="box-ico">🙂</span><span class="box-lbl">فرح</span></div>
+      <div class="box-btn" onclick="sortBoite('حزن',this)"><span class="box-ico">😢</span><span class="box-lbl">حزن</span></div>
+      <div class="box-btn" onclick="sortBoite('غضب',this)"><span class="box-ico">😠</span><span class="box-lbl">غضب</span></div>
+    </div>
+  </div>
+  <div class="game-result" id="boite-result" style="display:none">
+    <span class="big-ico-r">🏆</span>
+    <div class="r-title" id="boite-r-title"></div>
+    <div class="r-sub" id="boite-r-sub"></div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem;margin:1rem 0;font-size:12px;text-align:right" id="boite-detail"></div>
+    <button class="btn primary" onclick="leaveGame('boite',true)">رجوع إلى القائمة</button>
+  </div>
+</div>
+
+<!-- GAME 3: RESPIRATION -->
+<div id="s-game-respiration" class="screen">
+  <div class="g-topbar"><button class="g-back" onclick="leaveRespiration()">← رجوع</button><span class="g-title">🎈 التنفس الملون</span></div>
+  <!-- Phase 1: color pick -->
+  <div id="resp-p1">
+    <div class="pg-title" style="margin-bottom:.5rem">اختر لونك</div>
+    <div class="pg-sub">ثم سنتنفس معاً</div>
+    <div class="breath-palette">
+      <div class="color-swatch" style="background:#EF4444" onclick="startBreathSession('#EF4444',this)"></div>
+      <div class="color-swatch" style="background:#3B82F6" onclick="startBreathSession('#3B82F6',this)"></div>
+      <div class="color-swatch" style="background:#EAB308" onclick="startBreathSession('#EAB308',this)"></div>
+      <div class="color-swatch" style="background:#10B981" onclick="startBreathSession('#10B981',this)"></div>
+      <div class="color-swatch" style="background:#8B5CF6" onclick="startBreathSession('#8B5CF6',this)"></div>
+    </div>
+  </div>
+  <!-- Phase 2: breathing -->
+  <div id="resp-p2" style="display:none">
+    <div class="breath-phase" id="breath-text">اضغط ابدأ...</div>
+    <div style="display:flex;justify-content:center;margin:.5rem 0">
+      <div class="breath-circle" id="breath-circle"></div>
+    </div>
+    <div class="breath-cycles" id="breath-counter">الجولات: 0 / 5</div>
+    <div class="breath-ctrl">
+      <button class="b-btn play" id="b-play" onclick="toggleBreath()">▶ ابدأ</button>
+      <button class="b-btn" onclick="finishRespiration()">إنهاء ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME 4: CORPS COLOR -->
+<div id="s-game-corps-color" class="screen">
+  <div class="g-topbar"><button class="g-back" onclick="leaveGame('corps-color')">← رجوع</button><span class="g-title">🗺️ خريطة الجسد</span></div>
+  <div class="pg-sub" style="margin-bottom:.5rem">اختر لوناً ثم انقر على منطقة الجسد</div>
+  <div class="cc-wrap">
+    <div class="brushes" id="brushes">
+      <div class="brush-row selected" onclick="selectBrush(this,'#EF4444')" data-color="#EF4444"><div class="brush-dot" style="background:#EF4444"></div><span class="brush-name">غضب</span></div>
+      <div class="brush-row" onclick="selectBrush(this,'#F59E0B')" data-color="#F59E0B"><div class="brush-dot" style="background:#F59E0B"></div><span class="brush-name">فرح</span></div>
+      <div class="brush-row" onclick="selectBrush(this,'#3B82F6')" data-color="#3B82F6"><div class="brush-dot" style="background:#3B82F6"></div><span class="brush-name">حزن</span></div>
+      <div class="brush-row" onclick="selectBrush(this,'#8B5CF6')" data-color="#8B5CF6"><div class="brush-dot" style="background:#8B5CF6"></div><span class="brush-name">قلق</span></div>
+      <div class="brush-row" onclick="selectBrush(this,'#10B981')" data-color="#10B981"><div class="brush-dot" style="background:#10B981"></div><span class="brush-name">راحة</span></div>
+      <div class="brush-row" onclick="selectBrush(this,'#D3D1C7')" data-color="#D3D1C7"><div class="brush-dot" style="background:#D3D1C7;border:1px solid #ccc"></div><span class="brush-name">مسح</span></div>
+    </div>
+    <svg width="155" height="310" viewBox="0 0 130 270" xmlns="http://www.w3.org/2000/svg">
+      <g style="cursor:pointer" onclick="colorZone('head')"><ellipse cx="65" cy="30" rx="23" ry="26" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1" id="cc-head-fill"/><text x="65" y="35" text-anchor="middle" font-size="9" fill="#5F5E5A" font-family="sans-serif">الرأس</text></g>
+      <rect x="57" y="55" width="16" height="14" rx="3" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1" style="cursor:pointer" id="cc-neck-fill" onclick="colorZone('head')"/>
+      <g style="cursor:pointer" onclick="colorZone('chest')"><rect x="30" y="69" width="70" height="50" rx="7" fill="#B5D4F4" stroke="#185FA5" stroke-width="1" id="cc-chest-fill"/><text x="65" y="99" text-anchor="middle" font-size="9" fill="#0C447C" font-family="sans-serif">الصدر</text></g>
+      <g style="cursor:pointer" onclick="colorZone('belly')"><rect x="34" y="122" width="62" height="44" rx="7" fill="#C0DD97" stroke="#3B6D11" stroke-width="1" id="cc-belly-fill"/><text x="65" y="149" text-anchor="middle" font-size="9" fill="#27500A" font-family="sans-serif">البطن</text></g>
+      <g style="cursor:pointer" onclick="colorZone('arms')"><rect x="4" y="72" width="22" height="76" rx="9" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1" id="cc-arms-l"/><rect x="104" y="72" width="22" height="76" rx="9" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1" id="cc-arms-r"/></g>
+      <g style="cursor:pointer" onclick="colorZone('legs')"><rect x="34" y="169" width="24" height="88" rx="9" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1" id="cc-legs-l"/><rect x="72" y="169" width="24" height="88" rx="9" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="1" id="cc-legs-r"/><text x="65" y="228" text-anchor="middle" font-size="9" fill="#5F5E5A" font-family="sans-serif">الساقان</text></g>
+    </svg>
+  </div>
+  <div style="background:var(--al);border-radius:var(--border-radius-md);padding:6px 10px;font-size:11px;color:var(--ad);text-align:center">انقر على منطقة الجسد لتلوينها</div>
+  <div style="display:flex;gap:8px;margin-top:1rem">
+    <button class="btn primary" onclick="leaveGame('corps-color',true)">حفظ الخريطة ✓</button>
+    <button class="btn secondary" style="margin-top:0" onclick="resetCorpsColor()">مسح الكل</button>
+  </div>
+</div>
+
+<!-- EVALUATION -->
+<div id="s-eval" class="screen">
+  <div class="top-bar"><button onclick="showScreen('s-games-menu')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--color-text-secondary);font-family:var(--font-sans)">← رجوع</button><span style="font-size:14px;font-weight:500">تقييم التفاعل</span></div>
+  <div class="lbl" style="margin-bottom:.5rem">التمارين المُنجزة</div>
+  <div id="games-done-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem"></div>
+  <hr class="divider">
+  <div class="lbl" style="margin-bottom:.75rem">كيف كان تفاعل المستفيد؟</div>
+  <div class="ir-row">
+    <div class="ir-btn" onclick="pickInteract(this,'تفاعل ممتاز','🌟')"><span class="ir-icon">🌟</span><div class="ir-lbl">تفاعل ممتاز</div></div>
+    <div class="ir-btn" onclick="pickInteract(this,'تفاعل متوسط','👍')"><span class="ir-icon">👍</span><div class="ir-lbl">تفاعل متوسط</div></div>
+    <div class="ir-btn" onclick="pickInteract(this,'لم يتفاعل / رفض','❌')"><span class="ir-icon">❌</span><div class="ir-lbl">لم يتفاعل / رفض</div></div>
+  </div>
+  <hr class="divider">
+  <div class="lbl">ملاحظة المعالج</div>
+  <textarea id="ex-note" class="note-ta" rows="3" placeholder="ملاحظاتك حول الجلسة والتفاعل..."></textarea>
+  <button class="btn primary" onclick="savePat()" style="margin-top:1rem">حفظ المستفيد ✓</button>
+</div>
+
+<!-- SAVED -->
+<div id="s-saved" class="screen">
+  <div style="text-align:center;padding:1.5rem 0 1rem">
+    <div style="font-size:36px;margin-bottom:.75rem">✓</div>
+    <div style="font-size:16px;font-weight:500;color:var(--t);margin-bottom:6px" id="sv-name"></div>
+    <div style="font-size:13px;color:var(--color-text-secondary)" id="sv-summary"></div>
+  </div>
+  <div class="saved-chips" id="sv-chips"></div>
+  <button class="btn primary" style="margin-top:1.25rem" onclick="startNew()">+ مستفيد آخر</button>
+  <button class="btn secondary" onclick="goGrid()">عرض الشبكة ←</button>
+</div>
+
+<!-- GRID -->
+<div id="s-grid" class="screen">
+  <div class="top-bar"><button onclick="goHome()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--color-text-secondary);font-family:var(--font-sans)">← رجوع</button><span style="font-size:13px;font-weight:500">شبكة الملاحظة <span class="cb" id="grid-count">0</span></span></div>
+  <div id="grid-body"></div>
+  <div id="export-bar" style="display:none;flex-direction:column;gap:8px;margin-top:1rem">
+    <button class="btn word" onclick="downloadWord()">⬇ تحميل تقرير Word (.doc)</button>
+    <button class="btn secondary" onclick="if(confirm('مسح جميع البيانات؟')){patients=[];renderGrid();updateCount()}">مسح الكل</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ─── CONSTANTS ─────────────────────────────────
+const ZC={head:'#AFA9EC',chest:'#378ADD',belly:'#639922',arms:'#FAC775',legs:'#D3C97A'};
+const ZD={head:'#D3D1C7',chest:'#B5D4F4',belly:'#C0DD97',arms:'#D3D1C7',legs:'#D3D1C7'};
+const ZL={head:'الرأس',chest:'الصدر',belly:'البطن',arms:'الذراعان',legs:'الساقان'};
+const GN={miroir:'🪞 لعبة المرايا',boite:'📦 صندوق المواقف',respiration:'🎈 التنفس الملون','corps-color':'🗺️ خريطة الجسد'};
+const MQ=[
+  {e:'😠',a:'غضب',o:['فرح','غضب','حزن','خوف']},
+  {e:'😊',a:'فرح',o:['غضب','فرح','حزن','خوف']},
+  {e:'😢',a:'حزن',o:['فرح','غضب','حزن','خوف']},
+  {e:'😨',a:'خوف',o:['فرح','خوف','حزن','غضب']},
+  {e:'😴',a:'تعب',o:['تعب','خوف','فرح','حزن']},
+  {e:'🤩',a:'فرح',o:['تعب','خوف','فرح','غضب']},
+  {e:'😡',a:'غضب',o:['تعب','فرح','حزن','غضب']},
+  {e:'😌',a:'راحة',o:['تعب','راحة','حزن','غضب']},
+];
+const BI=[
+  {e:'🎁',t:'هدية',b:'فرح'},{e:'🎉',t:'حفلة',b:'فرح'},
+  {e:'💔',t:'فراق',b:'حزن'},{e:'🌧️',t:'مطر حزين',b:'حزن'},
+  {e:'🗣️',t:'شجار',b:'غضب'},{e:'⏳',t:'انتظار طويل',b:'غضب'},
+];
+
+// ─── STATE ─────────────────────────────────────
+let cur={},patients=[],bz=new Set();
+let mQ=[],mIdx=0,mScore=0,mLog=[];
+let bItems=[],bIdx=0,bScore=0,bLog=[];
+let breathPlaying=false,breathTimer=null,breathCycles=0,breathColor='#3B82F6';
+let brushColor='#EF4444';
+let ccColors={};
+
+document.getElementById('home-date').textContent=new Date().toLocaleDateString('ar-MA',{day:'2-digit',month:'long',year:'numeric'});
+
+// ─── NAVIGATION ────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  if(id==='s-eval')populateEvalScreen();
+  // stop breath only if leaving the respiration screen
+  if(id!=='s-game-respiration')stopBreath();
+}
+function goHome(){showScreen('s-home');updateCount();}
+function goGrid(){renderGrid();showScreen('s-grid');}
+function updateCount(){document.getElementById('home-count').textContent=patients.length;}
+
+// ─── PATIENT INIT ──────────────────────────────
+function startNew(){
+  cur={name:'',age:'',wx:null,wxE:'',wxN:'',face:'',faceE:'',zones:[],corpsNote:'',mot:'',motNote:'',
+       gamesPlayed:[],gamesDone:[],gameScores:{},gameDetailedLogs:{},
+       interactionRating:'',interactionE:'',exercicesNote:'',ccMap:{}};
+  bz.clear();ccColors={};
+  resetCorpsColor();
+  ['reg-name','reg-age','corps-note','mot-val','mot-note','ex-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.querySelectorAll('.wx-card,.fc,.ir-btn').forEach(c=>c.classList.remove('on'));
+  document.getElementById('wx-next').style.display='none';
+  document.getElementById('face-next').style.display='none';
+  document.querySelectorAll('.game-card').forEach(c=>c.classList.remove('started','done'));
+  renderBZ();
+  stopBreath();
+  showScreen('s-reg');
+}
+function startActivity(){
+  const n=document.getElementById('reg-name').value.trim();
+  if(!n){document.getElementById('reg-name').focus();return;}
+  cur.name=n;cur.age=document.getElementById('reg-age').value.trim();
+  const lbl=n+(cur.age?' · '+cur.age+' سنة':'');
+  ['sn1','sn2','sn3','sn4'].forEach(id=>document.getElementById(id).textContent=lbl);
+  showScreen('s-meteo');
+}
+function saveMot(){
+  cur.corpsNote=document.getElementById('corps-note').value.trim();
+  cur.mot=document.getElementById('mot-val').value.trim();
+  cur.motNote=document.getElementById('mot-note').value.trim();
+  cur.zones=[...bz].map(z=>ZL[z]);
+}
+function pickWx(el,wx,em,name){document.querySelectorAll('.wx-card').forEach(c=>c.classList.remove('on'));el.classList.add('on');cur.wx=wx;cur.wxE=em;cur.wxN=name;document.getElementById('wx-next').style.display='block';}
+function pickFace(el,em,name){document.querySelectorAll('.fc').forEach(c=>c.classList.remove('on'));el.classList.add('on');cur.face=name;cur.faceE=em;document.getElementById('face-next').style.display='block';}
+function toggleBZ(id){if(bz.has(id))bz.delete(id);else bz.add(id);renderBZ();}
+function renderBZ(){
+  for(const z of Object.keys(ZD)){const g=document.getElementById('bz-'+z);if(g)g.querySelectorAll('rect,ellipse').forEach(e=>e.setAttribute('fill',bz.has(z)?ZC[z]:ZD[z]));}
+  const el=document.getElementById('bz-active');
+  if(!bz.size){el.innerHTML='<span style="font-size:12px;color:var(--color-text-tertiary)">لا شيء</span>';return;}
+  el.innerHTML=[...bz].map(z=>`<span class="zpill">${ZL[z]}</span>`).join('');
+  cur.zones=[...bz].map(z=>ZL[z]);
+}
+
+// ─── GAMES SHARED ──────────────────────────────
+function markStarted(id){if(!cur.gamesPlayed.includes(id))cur.gamesPlayed.push(id);const c=document.getElementById('gc-'+id.replace('corps-color','corps'));if(c){c.classList.remove('done');c.classList.add('started');}}
+function markDone(id,score,log){
+  if(!cur.gamesDone.includes(id))cur.gamesDone.push(id);
+  if(score!==undefined)cur.gameScores[id]=score;
+  if(log)cur.gameDetailedLogs[id]=log;
+  const c=document.getElementById('gc-'+id.replace('corps-color','corps'));
+  if(c){c.classList.remove('started');c.classList.add('done');}
+}
+function leaveGame(id,done=false){
+  if(done)markDone(id);else markStarted(id);
+  showScreen('s-games-menu');
+}
+
+// ─── GAME 1: MIROIR ────────────────────────────
+function shuffle(a){return [...a].sort(()=>Math.random()-.5);}
+function initMiroir(){
+  markStarted('miroir');
+  mQ=shuffle(MQ).slice(0,5);mIdx=0;mScore=0;mLog=[];
+  document.getElementById('mir-content').style.display='block';
+  document.getElementById('mir-result').style.display='none';
+  document.getElementById('mir-log').innerHTML='';
+  renderMQ();showScreen('s-game-miroir');
+}
+function renderMQ(){
+  const q=mQ[mIdx];
+  document.getElementById('mir-emoji').textContent=q.e;
+  document.getElementById('mir-qnum').textContent=(mIdx+1)+' / '+mQ.length;
+  document.getElementById('mir-prog').style.width=((mIdx/mQ.length)*100)+'%';
+  document.getElementById('mir-options').innerHTML=shuffle(q.o).map(o=>`<button class="mir-btn" onclick="answerMir('${o}',this)">${o}</button>`).join('');
+}
+function answerMir(ans,btn){
+  const q=mQ[mIdx];const ok=ans===q.a;
+  mLog.push({emoji:q.e,correct:q.a,given:ans,ok});
+  btn.classList.add(ok?'correct':'wrong');
+  if(ok)mScore++;
+  document.querySelectorAll('.mir-btn').forEach(b=>b.style.pointerEvents='none');
+  // update running log
+  const logEl=document.getElementById('mir-log');
+  logEl.innerHTML=mLog.map(l=>`<span>${l.emoji} → ${l.given} ${l.ok?'✅':'❌'}</span> &nbsp;`).join('');
+  setTimeout(()=>{mIdx++;if(mIdx>=mQ.length)showMirResult();else renderMQ();},ok?900:600);
+}
+function showMirResult(){
+  document.getElementById('mir-content').style.display='none';
+  document.getElementById('mir-result').style.display='block';
+  const pct=Math.round(mScore/mQ.length*100);
+  document.getElementById('mir-r-ico').textContent=pct>=80?'🌟':pct>=60?'👍':'💪';
+  document.getElementById('mir-r-title').textContent='النتيجة: '+mScore+' / '+mQ.length+' ('+pct+'%)';
+  document.getElementById('mir-r-sub').textContent=pct>=80?'ممتاز! تعرّف على المشاعر بشكل رائع.':pct>=60?'جيد! يحتاج بعض التدريب.':'شكراً على المحاولة — سنتدرب أكثر.';
+  document.getElementById('mir-detail').innerHTML='<strong>تفاصيل الإجابات:</strong><br>'+mLog.map(l=>`${l.emoji} الصحيح: <b>${l.correct}</b> — أجاب: <b>${l.given}</b> ${l.ok?'✅':'❌'}`).join('<br>');
+  markDone('miroir',mScore+'/'+mQ.length,mLog.map(l=>`${l.emoji}:${l.given}(${l.ok?'✓':'✗'})`).join(', '));
+}
+
+// ─── GAME 2: BOÎTE ─────────────────────────────
+function initBoite(){
+  markStarted('boite');
+  bItems=shuffle(BI).slice(0,5);bIdx=0;bScore=0;bLog=[];
+  document.getElementById('boite-content').style.display='block';
+  document.getElementById('boite-result').style.display='none';
+  renderBItem();showScreen('s-game-boite');
+}
+function renderBItem(){
+  const it=bItems[bIdx];
+  document.getElementById('sit-emoji').textContent=it.e;
+  document.getElementById('sit-text').textContent=it.t;
+  document.getElementById('boite-qnum').textContent=(bIdx+1)+' / '+bItems.length;
+  document.getElementById('boite-prog').style.width=((bIdx/bItems.length)*100)+'%';
+  document.querySelectorAll('.box-btn').forEach(b=>b.style.pointerEvents='');
+}
+function sortBoite(box,el){
+  const it=bItems[bIdx];const ok=box===it.b;
+  bLog.push({emoji:it.e,text:it.t,correct:it.b,given:box,ok});
+  if(ok)bScore++;
+  el.classList.add(ok?'correct-flash':'wrong-flash');
+  if(ok)document.querySelectorAll('.box-btn').forEach(b=>b.style.pointerEvents='none');
+  setTimeout(()=>{
+    el.classList.remove('correct-flash','wrong-flash');
+    if(ok){bIdx++;if(bIdx>=bItems.length)showBoiteResult();else renderBItem();}
+  },ok?700:500);
+}
+function showBoiteResult(){
+  document.getElementById('boite-content').style.display='none';
+  document.getElementById('boite-result').style.display='block';
+  const pct=Math.round(bScore/bItems.length*100);
+  document.getElementById('boite-r-title').textContent='النتيجة: '+bScore+' / '+bItems.length+' ('+pct+'%)';
+  document.getElementById('boite-r-sub').textContent=pct>=80?'رائع! صنّف المواقف بشكل ممتاز.':pct>=60?'جيد جداً!':'شكراً على المحاولة.';
+  document.getElementById('boite-detail').innerHTML='<strong>تفاصيل الإجابات:</strong><br>'+bLog.map(l=>`${l.emoji} ${l.text} → ${l.given} ${l.ok?'✅':'❌'} (الصحيح: ${l.correct})`).join('<br>');
+  markDone('boite',bScore+'/'+bItems.length,bLog.map(l=>`${l.emoji}:${l.given}(${l.ok?'✓':'✗'})`).join(', '));
+}
+
+// ─── GAME 3: RESPIRATION ───────────────────────
+function initRespiration(){
+  markStarted('respiration');
+  // reset phases
+  document.getElementById('resp-p1').style.display='block';
+  document.getElementById('resp-p2').style.display='none';
+  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+  stopBreath();
+  breathCycles=0;
+  document.getElementById('breath-counter').textContent='الجولات: 0 / 5';
+  document.getElementById('breath-text').textContent='اضغط ابدأ...';
+  document.getElementById('b-play').textContent='▶ ابدأ';
+  showScreen('s-game-respiration');
+}
+function startBreathSession(hex,el){
+  breathColor=hex;
+  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+  const circle=document.getElementById('breath-circle');
+  circle.style.background=hex;
+  circle.style.animationPlayState='paused';
+  document.getElementById('resp-p1').style.display='none';
+  document.getElementById('resp-p2').style.display='block';
+}
+function toggleBreath(){
+  if(!breathPlaying){
+    breathPlaying=true;
+    document.getElementById('breath-circle').style.animationPlayState='running';
+    document.getElementById('b-play').textContent='⏸ إيقاف';
+    let phase='in';
+    document.getElementById('breath-text').textContent='استنشق...';
+    breathTimer=setInterval(()=>{
+      phase=phase==='in'?'out':'in';
+      document.getElementById('breath-text').textContent=phase==='in'?'استنشق...':'ازفر...';
+      if(phase==='in'){
+        breathCycles++;
+        document.getElementById('breath-counter').textContent='الجولات: '+breathCycles+' / 5';
+        if(breathCycles>=5){finishRespiration();}
+      }
+    },4000);
+  } else {
+    stopBreath();
+    document.getElementById('b-play').textContent='▶ استمرار';
+    document.getElementById('breath-text').textContent='متوقف مؤقتاً...';
+  }
+}
+function stopBreath(){
+  breathPlaying=false;
+  clearInterval(breathTimer);breathTimer=null;
+  const c=document.getElementById('breath-circle');
+  if(c)c.style.animationPlayState='paused';
+}
+function finishRespiration(){
+  stopBreath();
+  markDone('respiration',breathCycles+' جولات','أنجز '+breathCycles+' من أصل 5 جولات تنفس');
+  showScreen('s-games-menu');
+}
+function leaveRespiration(){stopBreath();markStarted('respiration');showScreen('s-games-menu');}
+
+// ─── GAME 4: CORPS COLOR ───────────────────────
+function initCorpsColor(){markStarted('corps-color');showScreen('s-game-corps-color');}
+function selectBrush(el,color){document.querySelectorAll('.brush-row').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');brushColor=color;}
+function colorZone(zone){
+  ccColors[zone]=brushColor;
+  const map={head:['cc-head-fill','cc-neck-fill'],chest:['cc-chest-fill'],belly:['cc-belly-fill'],arms:['cc-arms-l','cc-arms-r'],legs:['cc-legs-l','cc-legs-r']};
+  if(map[zone])map[zone].forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('fill',brushColor);});
+}
+function resetCorpsColor(){
+  ccColors={};
+  const def={head:'#D3D1C7',chest:'#B5D4F4',belly:'#C0DD97',arms:'#D3D1C7',legs:'#D3D1C7'};
+  const ids={'cc-head-fill':def.head,'cc-neck-fill':def.head,'cc-chest-fill':def.chest,'cc-belly-fill':def.belly,'cc-arms-l':def.arms,'cc-arms-r':def.arms,'cc-legs-l':def.legs,'cc-legs-r':def.legs};
+  Object.entries(ids).forEach(([id,c])=>{const el=document.getElementById(id);if(el)el.setAttribute('fill',c);});
+}
+
+// ─── EVALUATION SCREEN ─────────────────────────
+function populateEvalScreen(){
+  const list=document.getElementById('games-done-list');
+  const all=['miroir','boite','respiration','corps-color'];
+  const played=all.filter(g=>cur.gamesPlayed.includes(g)||cur.gamesDone.includes(g));
+  if(!played.length){list.innerHTML='<span style="font-size:12px;color:var(--color-text-tertiary)">لم تُلعب تمارين</span>';return;}
+  list.innerHTML=played.map(g=>{
+    const done=cur.gamesDone.includes(g);
+    const score=cur.gameScores[g]?' ('+cur.gameScores[g]+')':'';
+    return `<span class="g-done-chip${done?' done':''}">${GN[g]}${score}${done?' ✓':''}</span>`;
+  }).join('');
+}
+function pickInteract(el,label,em){document.querySelectorAll('.ir-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');cur.interactionRating=label;cur.interactionE=em;}
+
+// ─── SAVE PATIENT ──────────────────────────────
+function savePat(){
+  cur.exercicesNote=document.getElementById('ex-note').value.trim();
+  cur.ccMap={...ccColors};
+  patients.push({...cur});
+  const parts=[];
+  if(cur.wxE)parts.push(cur.wxE+' '+cur.wxN);
+  if(cur.faceE)parts.push(cur.faceE+' '+cur.face);
+  if(cur.mot)parts.push('«'+cur.mot+'»');
+  if(cur.gamesDone.length)parts.push(cur.gamesDone.map(g=>GN[g]).join(' · '));
+  if(cur.interactionE)parts.push(cur.interactionE+' '+cur.interactionRating);
+  document.getElementById('sv-name').textContent='تم حفظ '+cur.name+' ✓';
+  document.getElementById('sv-summary').textContent=parts.join(' · ')||'تم التسجيل';
+  document.getElementById('sv-chips').innerHTML=parts.map(p=>`<span class="zpill">${p}</span>`).join('');
+  updateCount();showScreen('s-saved');
+}
+
+// ─── GRID ──────────────────────────────────────
+function renderGrid(){
+  const body=document.getElementById('grid-body');
+  const bar=document.getElementById('export-bar');
+  document.getElementById('grid-count').textContent=patients.length;
+  if(!patients.length){body.innerHTML='<div class="empty">لا يوجد مستفيدون بعد</div>';bar.style.display='none';return;}
+  bar.style.display='flex';
+  body.innerHTML=patients.map(p=>{
+    const meta=[p.age?p.age+' سنة':'',p.wxN,p.face].filter(Boolean).join(' · ');
+    const zones=p.zones&&p.zones.length?p.zones.join('، '):'';
+    const exStr=p.gamesDone&&p.gamesDone.length?p.gamesDone.map(g=>{const sc=p.gameScores&&p.gameScores[g]?' ('+p.gameScores[g]+')':'';return GN[g]+sc;}).join(' · '):'';
+    const interStr=p.interactionE?p.interactionE+' '+p.interactionRating:'';
+    return `<div class="gc"><div style="font-size:20px;flex-shrink:0;margin-top:2px">${p.wxE||'—'}</div>
+      <div class="gi"><div class="gn">${p.name}</div><div class="gm">${meta}</div>
+      ${p.mot?`<div class="gmot">«${p.mot}»</div>`:''}
+      ${zones?`<div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">الجسد: ${zones}</div>`:''}
+      ${exStr?`<div class="gex">${exStr}${interStr?' · '+interStr:''}</div>`:''}
+      </div><div class="gav">${p.name[0]||'م'}</div></div>`;
+  }).join('');
+}
+
+// ─── WORD EXPORT ───────────────────────────────
+function downloadWord(){
+  if(!patients.length)return;
+  const date=new Date().toLocaleDateString('ar-MA',{day:'2-digit',month:'long',year:'numeric'});
+  const rows=patients.map(p=>`<tr>
+    <td style="background:#E1F5EE;font-weight:bold;padding:7px;border:1px solid #ccc;text-align:right">${p.name}</td>
+    <td style="padding:7px;border:1px solid #ccc">${p.age?p.age+' سنة':'—'}</td>
+    <td style="padding:7px;border:1px solid #ccc;text-align:center">${p.wxE||'—'} ${p.wxN||''}</td>
+    <td style="padding:7px;border:1px solid #ccc">${p.faceE||''} ${p.face||'—'}</td>
+    <td style="padding:7px;border:1px solid #ccc">${p.zones&&p.zones.length?p.zones.join('، '):'—'}</td>
+    <td style="padding:7px;border:1px solid #ccc;font-weight:bold;color:#085041">${p.mot||'—'}</td>
+    <td style="padding:7px;border:1px solid #ccc;color:#185FA5;font-size:10pt">
+      ${p.gamesDone&&p.gamesDone.length?p.gamesDone.map(g=>{const sc=p.gameScores&&p.gameScores[g]?' ('+p.gameScores[g]+')':'';return GN[g]+sc;}).join('<br>'):'—'}
+      ${p.interactionE?'<br><b>'+p.interactionE+' '+p.interactionRating+'</b>':''}
+    </td>
+  </tr>`).join('');
+
+  const analysis=patients.map((p,i)=>{
+    // detailed game logs
+    const gameAnalysis=Object.entries(p.gameDetailedLogs||{}).map(([gid,log])=>{
+      const score=p.gameScores&&p.gameScores[gid]?p.gameScores[gid]:'—';
+      return `<tr><td style="background:#F1EFE8;padding:5px 8px;border:1px solid #ccc">${GN[gid]}</td>
+        <td style="padding:5px 8px;border:1px solid #ccc">النتيجة: <b>${score}</b><br><small style="color:#666">${log}</small></td></tr>`;
+    }).join('');
+    const gamesStartedNotDone=(p.gamesPlayed||[]).filter(g=>!(p.gamesDone||[]).includes(g));
+    const gText=p.gamesDone&&p.gamesDone.length
+      ?`مارس المستفيد التمارين التالية وأكملها: <strong>${p.gamesDone.map(g=>GN[g]).join('، ')}</strong>.
+       ${gamesStartedNotDone.length?'كما بدأ دون إكمال: <strong>'+gamesStartedNotDone.map(g=>GN[g]).join('، ')+'</strong>.':''}
+       <br>مستوى التفاعل العام: <strong>${p.interactionE||''} ${p.interactionRating||'لم يُقيَّم'}</strong>.
+       ${p.interactionRating==='تفاعل ممتاز'?' يدل على انخراط مرتفع وإمكانية إدماج هذه الأدوات في الخطة العلاجية.':p.interactionRating==='تفاعل متوسط'?' يُوحي بإمكانية تحسن مع استمرار الممارسة.':p.interactionRating==='لم يتفاعل / رفض'?' يستدعي البحث في أسباب الرفض (قلق، حساسية حسية، مقاومة التغيير).':''}
+       ${p.exercicesNote?'<br><em>ملاحظة المعالج: '+p.exercicesNote+'</em>':''}`
+      :'لم تُمارَس تمارين في هذه الجلسة.';
+    return `
+    <h2 style="color:#1D9E75;font-size:13pt;border-bottom:1px solid #9FE1CB;padding-bottom:4px;margin-top:20px">المستفيد ${i+1} — ${p.name} ${p.age?'('+p.age+' سنة)':''}</h2>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:10pt">
+      <tr><td style="background:#1D9E75;color:white;padding:5px 8px;border:1px solid #ccc;width:28%;font-weight:bold">المحور</td><td style="background:#1D9E75;color:white;padding:5px 8px;border:1px solid #ccc;font-weight:bold">البيانات</td></tr>
+      <tr><td style="background:#F1EFE8;padding:5px 8px;border:1px solid #ccc">الطقس</td><td style="padding:5px 8px;border:1px solid #ccc">${p.wxE||''} ${p.wxN||'غير محدد'}</td></tr>
+      <tr><td style="background:#F1EFE8;padding:5px 8px;border:1px solid #ccc">المشاعر</td><td style="padding:5px 8px;border:1px solid #ccc">${p.faceE||''} ${p.face||'—'}</td></tr>
+      <tr><td style="background:#F1EFE8;padding:5px 8px;border:1px solid #ccc">الجسد</td><td style="padding:5px 8px;border:1px solid #ccc">${p.zones&&p.zones.length?p.zones.join('، '):'—'}</td></tr>
+      <tr><td style="background:#F1EFE8;padding:5px 8px;border:1px solid #ccc">الكلمة</td><td style="padding:5px 8px;border:1px solid #ccc;font-weight:bold;color:#085041">${p.mot||'—'}</td></tr>
+      ${gameAnalysis}
+    </table>
+    <div style="background:#E1F5EE;border-right:3px solid #1D9E75;padding:10px 12px;font-size:10.5pt;line-height:1.9;margin-bottom:8px">
+      <strong>التحليل السريري:</strong> أظهر المستفيد ${p.name} طقساً عاطفياً <strong>${p.wxN||'غير محدد'}</strong>،
+      ${p.wx==='cloudy'?'يُشير إلى غموض وجداني وتردد في الوصول الواعي للمشاعر.':p.wx==='sunny'?'يدل على حالة نفسية مستقرة وجاهزية للتفاعل.':p.wx==='rainy'?'يُوحي بحزن أو تعب نفسي.':p.wx==='stormy'?'يُشير إلى توتر داخلي ملحوظ.':'يستدعي متابعة دقيقة.'}
+      ${p.zones&&p.zones.length?' وأشار إلى منطقة <strong>'+p.zones.join(' و')+'</strong> كموقع للإحساس الجسدي.':''}
+      ${p.mot?' كلمته <strong>«'+p.mot+'»</strong> تستحق التعمق في الجلسات المقبلة.':''}
+    </div>
+    <div style="background:#EEF4FB;border-right:3px solid #185FA5;padding:10px 12px;font-size:10.5pt;line-height:1.9;margin-bottom:20px">
+      <strong>التمارين والتفاعل:</strong> ${gText}
+    </div>`;
+  }).join('');
+
+  const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;direction:rtl;font-size:11pt;color:#2C2C2A;margin:2cm}h1{color:#085041;font-size:16pt;border-bottom:2px solid #1D9E75;padding-bottom:5px;margin-top:22px}hr{border:none;border-top:1px solid #9FE1CB;margin:16px 0}table{width:100%;border-collapse:collapse;margin:10px 0}</style></head>
+<body>
+<div style="text-align:center;padding:40px 0 50px">
+  <p style="color:#444;font-size:13pt;margin-bottom:4px">جامعة محمد الخامس — الرباط</p>
+  <p style="color:#666;font-size:11pt;margin-bottom:30px">كلية الآداب والعلوم الإنسانية — شعبة علم النفس — السنة الثالثة</p>
+  <p style="color:#085041;font-size:22pt;font-weight:bold;margin:0 0 6px">تقرير التدريب الميداني</p>
+  <p style="color:#1D9E75;font-size:14pt;margin-bottom:8px">stage d'observation — جمعية المستقبل، الرباط</p>
+  <p style="font-weight:bold;color:#444;margin-bottom:4px">جلسة التعبير العاطفي والتمارين التفاعلية</p>
+  <p style="color:#888">${date}</p>
+</div>
+<hr>
+<h1>أولاً: شبكة الملاحظة التلخيصية</h1>
+<table>
+<tr style="background:#1D9E75;color:white;font-size:10pt">
+  <th style="padding:7px;border:1px solid #ccc;text-align:right">المستفيد</th>
+  <th style="padding:7px;border:1px solid #ccc">السن</th>
+  <th style="padding:7px;border:1px solid #ccc">الطقس</th>
+  <th style="padding:7px;border:1px solid #ccc">المشاعر</th>
+  <th style="padding:7px;border:1px solid #ccc">الجسد</th>
+  <th style="padding:7px;border:1px solid #ccc">الكلمة</th>
+  <th style="padding:7px;border:1px solid #ccc">التمارين والتفاعل</th>
+</tr>${rows}</table>
+<hr>
+<h1>ثانياً: التحليل السريري الفردي</h1>${analysis}
+<hr>
+<h1>ثالثاً: التوصيات</h1>
+<ul>
+<li>توسيع التمارين لتشمل جميع المستفيدين المنتظمين.</li>
+<li>متابعة تطور النتائج بين الجلسات لرصد التقدم.</li>
+<li>إدماج التمارين ذات التفاعل المرتفع في البروتوكول الأسبوعي.</li>
+<li>التنسيق مع الفريق الطبي لمتابعة حالات الرفض.</li>
+</ul>
+<hr>
+<p style="text-align:center;color:#888;font-size:9pt">وُثِّق هذا التقرير في إطار تدريب ملاحظة السنة الثالثة — علم النفس — جامعة محمد الخامس، الرباط — ${date}</p>
+</body></html>`;
+  const blob=new Blob(['\ufeff'+html],{type:'application/msword;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='Rapport_Stage_'+new Date().toISOString().slice(0,10)+'.doc';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+</script>
